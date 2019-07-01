@@ -61,7 +61,7 @@ class Enquirable
   end
 
   def method_missing(symbol, *args, &block)
-    return recast_enum(symbol, *args, &block) if @enum.respond_to? symbol
+    return send_with_recast(symbol, *args, &block) if @enum.respond_to? symbol
 
     return true if @mapping.include? symbol
 
@@ -70,10 +70,10 @@ class Enquirable
     super
   end
 
-  def recast_enum(symbol, *args, &block)
-    enum = @enum.send(symbol, *args, &block)
-    return Enquirable.new(enum) if enum.is_a? @enum.class
+  def send_with_recast(symbol, *args, &block)
+    result = @enum.send(symbol, *args, &block)
+    return Enquirable.new(result) if result.is_a? @enum.class
 
-    enum
+    result
   end
 end
